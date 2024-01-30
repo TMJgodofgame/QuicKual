@@ -73,6 +73,8 @@ Reopen Microsoft Word and verify that the change has been applied successfully.
 
 It's important to note that replacing the Normal.dotm file can affect the default settings of Microsoft Word. Make sure to have a backup of the original file in case you need to revert the changes. Additionally, be aware that paths and locations may vary depending on the version of Microsoft Word and the operating system.
 
+![Imagen de la portada](https://github.com/TMJgodofgame/QuicKual/blob/main/aa_page-0001.jpg)
+
 # Español:
 
 Bienvenido a la plantilla de Word mejorada con la función QuicKual, un complemento innovador diseñado para facilitar tus tareas matemáticas en distintos niveles. QuicKual, una combinación de las palabras "Quick" (rápido) y "Equal" (igual), ha sido integrado en el botón "Insertar" para ofrecerte una experiencia de usuario más eficiente y cómoda.
@@ -146,3 +148,6 @@ Paso 4: Reinicia Microsoft Word:
 Vuelve a abrir Microsoft Word y verifica que el cambio se haya aplicado correctamente.
 
 Es importante tener en cuenta que reemplazar el archivo Normal.dotm puede afectar la configuración predeterminada de Microsoft Word. Asegúrate de tener una copia de seguridad del archivo original por si necesitas revertir los cambios. Además, ten en cuenta que las rutas y ubicaciones pueden variar según la versión de Microsoft Word y el sistema operativo.
+
+![Imagen de la portada](https://github.com/TMJgodofgame/QuicKual/blob/main/aa_page-0001.jpg)
+
