@@ -23,6 +23,14 @@ def abrir_word_y_nuevo_doc():
     pyautogui.write('y')
     print("📝 Word debería estar listo.")
 
+def quickual():
+    pyautogui.hotkey('down', 'down', 'down', 'down', 'down')
+    time.sleep(1)
+    pyautogui.hotkey('alt')
+    pyautogui.write('b2')
+    pyautogui.write('y')
+    print("Quickual debería estar listo.")
+    
 def convertir_numeros_es(texto):
     texto = re.sub(r'(\d+)\s*(?:coma|con)\s*(\d+)', r'\1,\2', texto, flags=re.IGNORECASE)
     tokens = re.split(r'(\s+)', texto)
@@ -43,6 +51,25 @@ def convertir_numeros_es(texto):
     texto2 = re.sub(r'(?<=\d),(?=\d{3}\b)', '', texto2)
     return texto2
 
+def ejecutar_movimiento_direccion(texto):
+    # Intenta detectar estructura como "20 derecha", "5 abajo", etc.
+    patrones = {
+        'derecha': 'right',
+        'izquierda': 'left',
+        'arriba': 'up',
+        'abajo': 'down'
+    }
+
+    for palabra, tecla in patrones.items():
+        match = re.search(rf'(\d+)\s+{palabra}', texto)
+        if match:
+            cantidad = int(match.group(1))
+            print(f"➡️ Moviendo {palabra} {cantidad} veces...")
+            for _ in range(cantidad):
+                pyautogui.press(tecla)
+            return True
+    return False
+
 def escuchar_y_teclear():
     with sr.Microphone() as source:
         print("🎙️ Habla ahora...")
@@ -54,7 +81,7 @@ def escuchar_y_teclear():
 
         texto_lower = texto.lower().strip()
 
-        if texto_lower == "operación matemáticas" or texto_lower == "operación matemática":
+        if texto_lower == "operación matemáticas" or texto_lower == "operación matemática" or texto_lower == "operación mate":
             abrir_word_y_nuevo_doc()
             return
 
@@ -62,7 +89,11 @@ def escuchar_y_teclear():
             print("✅ Acción: presionando Enter")
             pyautogui.press('enter')
             return
-
+        
+        if texto_lower == "otra operación" or texto_lower == "otra operación matemática" or texto_lower == "otra vez":
+            quickual()
+            return
+        
         texto_convertido = convertir_numeros_es(texto)
         print(f"📝 Convertido a: {texto_convertido}")
 
