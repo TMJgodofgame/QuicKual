@@ -64,16 +64,18 @@ def convertir_numeros_es(texto):
     return texto2
 
 def ejecutar_movimiento_direccion(texto):
-    # Intenta detectar estructura como "20 derecha", "5 abajo", etc.
+    texto = parser.parse(texto)  # Convertir palabras a números
+
     patrones = {
         'derecha': 'right',
         'izquierda': 'left',
         'arriba': 'up',
-        'abajo': 'down'
-    }
-
+        'abajo': 'down',
+        'borrar':'backspace',
+        'suprimir': 'delete'
+       }
     for palabra, tecla in patrones.items():
-        match = re.search(rf'(\d+)\s+{palabra}', texto)
+        match = re.search(r'(\d+)\s+' + palabra, texto)
         if match:
             cantidad = int(match.group(1))
             print(f"➡️ Moviendo {palabra} {cantidad} veces...")

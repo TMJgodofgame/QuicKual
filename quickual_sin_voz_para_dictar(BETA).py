@@ -2,6 +2,7 @@ import re
 import time
 import speech_recognition as sr
 import pyautogui
+import pyperclip
 from number_parser import parser
 
 # Inicialización
@@ -15,12 +16,9 @@ def abrir_word_y_nuevo_doc():
     pyautogui.write('word', interval=0.05)
     time.sleep(0.5)
     pyautogui.press('enter')
-    time.sleep(1)
+    time.sleep(2)
     pyautogui.hotkey('enter')
-    time.sleep(0.5)
-    pyautogui.hotkey('alt')
-    pyautogui.write('b2')
-    pyautogui.write('y')
+    time.sleep(1)
     print("📝 Word debería estar listo.")
 
 def quickual():
@@ -30,7 +28,7 @@ def quickual():
     pyautogui.write('b2')
     pyautogui.write('y')
     print("Quickual debería estar listo.")
-    
+
 def convertir_numeros_es(texto):
     texto = re.sub(r'(\d+)\s*(?:coma|con)\s*(\d+)', r'\1,\2', texto, flags=re.IGNORECASE)
     tokens = re.split(r'(\s+)', texto)
@@ -52,16 +50,18 @@ def convertir_numeros_es(texto):
     return texto2
 
 def ejecutar_movimiento_direccion(texto):
-    # Intenta detectar estructura como "20 derecha", "5 abajo", etc.
+    texto = parser.parse(texto)  # Convertir palabras a números
+
     patrones = {
         'derecha': 'right',
         'izquierda': 'left',
         'arriba': 'up',
-        'abajo': 'down'
-    }
-
+        'abajo': 'down',
+        'borrar':'backspace',
+        'suprimir': 'delete'
+       }
     for palabra, tecla in patrones.items():
-        match = re.search(rf'(\d+)\s+{palabra}', texto)
+        match = re.search(r'(\d+)\s+' + palabra, texto)
         if match:
             cantidad = int(match.group(1))
             print(f"➡️ Moviendo {palabra} {cantidad} veces...")
@@ -69,6 +69,10 @@ def ejecutar_movimiento_direccion(texto):
                 pyautogui.press(tecla)
             return True
     return False
+
+def escribir_texto(texto):
+    pyperclip.copy(texto)  # Copia el texto
+    pyautogui.hotkey('ctrl', 'v')  # Pega el texto
 
 def escuchar_y_teclear():
     with sr.Microphone() as source:
@@ -81,7 +85,10 @@ def escuchar_y_teclear():
 
         texto_lower = texto.lower().strip()
 
-        if texto_lower == "operación matemáticas" or texto_lower == "operación matemática" or texto_lower == "operación mate":
+        if ejecutar_movimiento_direccion(texto_lower):
+            return
+
+        if texto_lower in ["operación matemáticas", "operación matemática", "operación mate"]:
             abrir_word_y_nuevo_doc()
             return
 
@@ -89,20 +96,22 @@ def escuchar_y_teclear():
             print("✅ Acción: presionando Enter")
             pyautogui.press('enter')
             return
-        
-        if texto_lower == "otra operación" or texto_lower == "otra operación matemática" or texto_lower == "otra vez":
+
+        if texto_lower in ["otra operación", "otra operación matemática", "otra vez"]:
             quickual()
             return
-        
+
+        # Convertir números en el texto
         texto_convertido = convertir_numeros_es(texto)
         print(f"📝 Convertido a: {texto_convertido}")
 
+        # Borrar lo que había y escribir el nuevo texto
         time.sleep(0.2)
         pyautogui.hotkey('ctrl', 'a')
         pyautogui.press('backspace')
-        pyautogui.write(texto_convertido, interval=0)
+        escribir_texto(texto_convertido)
 
-        print("✅ Texto tecleado.")
+        print("✅ Texto escrito correctamente.")
     except sr.UnknownValueError:
         print("😕 No entendí lo que dijiste.")
     except sr.RequestError as e:
