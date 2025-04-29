@@ -39,10 +39,7 @@ def quickual():
     print("Quickual debería estar listo.")
 
 def convertir_numeros_es(texto):
-    # “5 coma 5” o “5 con 5” → “5,5”
     texto = re.sub(r'(\d+)\s*(?:coma|con)\s*(\d+)', r'\1,\2', texto, flags=re.IGNORECASE)
-
-    # Separar tokens
     tokens = re.split(r'(\s+)', texto)
     resultado = []
 
@@ -58,22 +55,19 @@ def convertir_numeros_es(texto):
             resultado.append(parser.parse(tok))
 
     texto2 = ''.join(resultado)
-
-    # Eliminar comas de miles, pero dejar las decimales
     texto2 = re.sub(r'(?<=\d),(?=\d{3}\b)', '', texto2)
     return texto2
 
 def ejecutar_movimiento_direccion(texto):
-    texto = parser.parse(texto)  # Convertir palabras a números
-
+    texto = parser.parse(texto)
     patrones = {
         'derecha': 'right',
         'izquierda': 'left',
         'arriba': 'up',
         'abajo': 'down',
-        'borrar':'backspace',
+        'borrar': 'backspace',
         'suprimir': 'delete'
-       }
+    }
     for palabra, tecla in patrones.items():
         match = re.search(r'(\d+)\s+' + palabra, texto)
         if match:
@@ -83,6 +77,11 @@ def ejecutar_movimiento_direccion(texto):
                 pyautogui.press(tecla)
             return True
     return False
+
+def escribir_texto(texto):
+    pyautogui.hotkey('escape')
+    time.sleep(0.2)
+    pyautogui.write(texto, interval=0.5)
 
 def escuchar_y_teclear():
     with sr.Microphone() as source:
@@ -95,23 +94,25 @@ def escuchar_y_teclear():
 
         texto_lower = texto.lower().strip()
 
-        # Acción especial: abrir Word
-        if texto_lower == "operación matemáticas" or texto_lower == "operación matemática":
+        if texto_lower in ["operación matemáticas", "operación matemática"]:
             abrir_word_y_nuevo_doc()
             return
 
-        # Acción especial: pulsar Enter
         if texto_lower == "aceptar":
             print("✅ Acción: presionando Enter")
             speak("Aceptado")
             pyautogui.press('enter')
             return
 
-        if texto_lower == "otra operación" or texto_lower == "otra operación matemática" or texto_lower == "otra vez":
+        if texto_lower in ["otra operación", "otra operación matemática", "otra vez"]:
             quickual()
             return
-        
-        # Procesamiento normal
+
+        # Mover cursor u otras acciones direccionales
+        if ejecutar_movimiento_direccion(texto_lower):
+            return
+
+        # Procesar texto
         texto_convertido = convertir_numeros_es(texto)
         print(f"📝 Convertido a: {texto_convertido}")
         speak(texto_convertido)
@@ -119,7 +120,13 @@ def escuchar_y_teclear():
         time.sleep(0.2)
         pyautogui.hotkey('ctrl', 'a')
         pyautogui.press('backspace')
-        pyautogui.write(texto_convertido, interval=0)
+
+        if texto_lower.startswith("escribe lentamente"):
+            texto_lento = texto_lower.replace("escribe lentamente", "").strip()
+            texto_convertido = convertir_numeros_es(texto_lento)
+            escribir_texto(texto_convertido)
+        else:
+            pyautogui.write(texto_convertido, interval=0)
 
         print("✅ Texto tecleado.")
     except sr.UnknownValueError:

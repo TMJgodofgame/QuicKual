@@ -71,8 +71,9 @@ def ejecutar_movimiento_direccion(texto):
     return False
 
 def escribir_texto(texto):
-    pyperclip.copy(texto)  # Copia el texto
-    pyautogui.hotkey('ctrl', 'v')  # Pega el texto
+    pyautogui.hotkey('escape')
+    time.sleep(0.2)
+    pyautogui.write(texto, interval=0.5)
 
 def escuchar_y_teclear():
     with sr.Microphone() as source:
